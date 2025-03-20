@@ -18,12 +18,20 @@ jobs:
             if [[ "$CIRCLE_NODE_INDEX" != "0" ]]; then
               sleep 30
             fi
-  # create a new job with the deploy step in it
+      # save the files your deploy step needs
+      - persist_to_workspace:
+          root: .     # relative path to our working directory
+          paths:      # file globs which will be persisted to the workspace
+           - rand_*
+
   deploy-job:
     docker:
       - image: cimg/base:stable
     steps:
-      - run: # change "deploy" to "run"
+      # attach the files you persisted in the doing-things-job
+      - attach_workspace:
+          at: . # relative path to our working directory
+      - run:
           command: |
             echo "this is a deploy step"
 
@@ -31,8 +39,6 @@ workflows:
   deploy-step-workflow:
     jobs:
       - doing-things-job
-      # add your new job and make it depend on the
-      # "doing-things-job"
       - deploy-job:
           requires:
             - doing-things-job
