@@ -8,13 +8,13 @@ jobs:
             ignore:
                 - gh-pages
         docker:
-            - image: circleci/node:10-browsers
+            - image: cimg/base:stable
         working_directory: ~/repo
         environment:
             - SOURCE_BRANCH: master
             - TARGET_BRANCH: gh-pages
         steps:
-            - checkout
+            - node/install-yarn
             - restore_cache:
                   keys:
                       - v2-dependencies-{{ checksum "package.json" }}
