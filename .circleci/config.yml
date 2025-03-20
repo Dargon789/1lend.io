@@ -1,23 +1,44 @@
 version: 2.1
-executors:
-  my-custom-executor:
+jobs:
+  doing-things-job:
     docker:
       - image: cimg/base:stable
-        auth:
-          # ensure you have first added these secrets
-          # visit app.circleci.com/settings/project/github/Dargon789/1lend.io/environment-variables
-          username: $DOCKER_HUB_USER
-          password: $DOCKER_HUB_PASSWORD
-jobs:
-  my-job-name:
-
-    executor: my-custom-executor
+    parallelism: 3
     steps:
       - checkout
-      - run: |
-          # echo Hello, World!
+      - run:
+          name: "Say hello"
+          command: "echo Hello, World!"
+      - run:
+          name: "Write random data"
+          command: openssl rand -hex 4 > rand_${CIRCLE_NODE_INDEX}.txt
+      - run:
+          name: "Emulate doing things"
+          command: |
+            if [[ "$CIRCLE_NODE_INDEX" != "0" ]]; then
+              sleep 30
+            fi
+      # save the files your deploy step needs
+      - persist_to_workspace:
+          root: .     # relative path to our working directory
+          paths:      # file globs which will be persisted to the workspace
+           - rand_*
+
+  deploy-job:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      # attach the files you persisted in the doing-things-job
+      - attach_workspace:
+          at: . # relative path to our working directory
+      - run:
+          command: |
+            echo "this is a deploy step"
 
 workflows:
-  my-custom-workflow:
+  deploy-step-workflow:
     jobs:
-      - my-job-name
+      - doing-things-job
+      - deploy-job:
+          requires:
+            - doing-things-job
