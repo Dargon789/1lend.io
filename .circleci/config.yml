@@ -7,14 +7,15 @@ jobs:
                 - release
             ignore:
                 - gh-pages
-        docker:
-            - image: cimg/base:stable
+        orbs:
+            node: circleci/node@7.1.0
+
         working_directory: ~/repo
         environment:
             - SOURCE_BRANCH: master
             - TARGET_BRANCH: gh-pages
         steps:
-            - node/install-yarn
+            - node/run/install-yarn
             - restore_cache:
                   keys:
                       - v2-dependencies-{{ checksum "package.json" }}
