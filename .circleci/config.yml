@@ -8,8 +8,10 @@ jobs:
             ignore:
                 - gh-pages
         orbs:
-            node: circleci/node@7.1.0
-
+          orb-tools: circleci/orb-tools@12.3.1
+        workflows:
+            jobs:
+                - orb-tools/pack
         working_directory: ~/repo
         environment:
             - SOURCE_BRANCH: master
