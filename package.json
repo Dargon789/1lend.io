@@ -36,7 +36,7 @@
         "@fortawesome/free-solid-svg-icons": "^5.9.0",
         "@ng-bootstrap/ng-bootstrap": "^18.0.0",
         "@portis/web3": "^2.0.0-beta.34",
-        "@toruslabs/torus-embed": "^0.0.22",
+        "@toruslabs/torus-embed": "^5.0.1",
         "@walletconnect/web3-provider": "^1.0.0-beta.32",
         "bootstrap": "^4.3.1",
         "bootswatch": "^4.3.1",
