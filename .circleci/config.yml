@@ -1,82 +1,23 @@
-version: 2
+version: 2.1
+executors:
+  my-custom-executor:
+    docker:
+      - image: cimg/base:stable
+        auth:
+          # ensure you have first added these secrets
+          # visit app.circleci.com/settings/project/github/Dargon789/1lend.io/environment-variables
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
 jobs:
-    build:
-        branches:
-            only:
-                - master
-                - release
-            ignore:
-                - gh-pages
-        orbs:
-          orb-tools: circleci/orb-tools@12.3.1
-        workflows:
-            jobs:
-                - orb-tools/pack
-        working_directory: ~/repo
-        environment:
-            - SOURCE_BRANCH: master
-            - TARGET_BRANCH: gh-pages
-        steps:
-            - node/run/install-yarn
-            - restore_cache:
-                  keys:
-                      - v2-dependencies-{{ checksum "package.json" }}
-                      - v2-dependencies-
-            - run:
-                  name: Install dependencies
-                  command: yarn
-            - save_cache:
-                  paths:
-                      - node_modules
-                  key: v2-dependencies-{{ checksum "package.json" }}
-            #      - run:
-            #          name: Run lint
-            #          command: yarn run lint
-            #      - run:
-            #          name: Run smart contract tests
-            #          command: yarn run sm:test
-            #      - run:
-            #          name: Run tests
-            #          command: yarn run test
-            #      - run:
-            #          name: Run e2e
-            #          command: yarn run e2e
-            #      - run:
-            #          name: Run coverage
-            #          command: yarn run coverage && cat coverage/lcov.info | coveralls
-            - deploy:
-                  name: Deploy Frontend
-                  command: |
-                      if [ $CIRCLE_BRANCH == $SOURCE_BRANCH ]; then
-                        git config --global user.email $GH_EMAIL
-                        git config --global user.name $GH_NAME
+  my-job-name:
 
-                        git clone $CIRCLE_REPOSITORY_URL out
+    executor: my-custom-executor
+    steps:
+      - checkout
+      - run: |
+          # echo Hello, World!
 
-                        cd out
-                        git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
-                        git rm -rf .
-                        cd ..
-
-                        yarn run build
-
-                        cp -a web/dist/web/. out/.
-
-                        mkdir -p out/.circleci && cp -a .circleci/. out/.circleci/.
-                        cd out
-
-                        echo "1lend.io" > CNAME
-
-                        git add -A
-                        git commit -m "Automated deployment to GitHub Pages: ${CIRCLE_SHA1}" --allow-empty
-
-                        git push origin $TARGET_BRANCH
-
-                        echo "Done!"
-                      fi
-#      - deploy:
-#          name: Deploy Smart Contract
-#          command: |
-#            if [ $CIRCLE_BRANCH == release ]; then
-#              yarn run sm:deploy:prod
-#            fi
+workflows:
+  my-custom-workflow:
+    jobs:
+      - my-job-name
