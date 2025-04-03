@@ -44,7 +44,7 @@
         "eth-lib": "^0.2.8",
         "etherlime": "^2.1.5",
         "ethers": "^6.13.5",
-        "fortmatic": "^0.8.2",
+        "fortmatic": "^2.4.0",
         "jazzicon": "^1.5.0",
         "locutus": "^2.0.11",
         "ngx-bootstrap": "^19.0.1",
