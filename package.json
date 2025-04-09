@@ -32,7 +32,7 @@
         "@fortawesome/fontawesome-free": "^5.9.0",
         "@fortawesome/fontawesome-svg-core": "^1.2.19",
         "@fortawesome/free-brands-svg-icons": "^5.9.0",
-        "@fortawesome/free-regular-svg-icons": "^5.9.0",
+        "@fortawesome/free-regular-svg-icons": "^6.7.2",
         "@fortawesome/free-solid-svg-icons": "^5.9.0",
         "@ng-bootstrap/ng-bootstrap": "^18.0.0",
         "@portis/web3": "^2.0.0-beta.34",
