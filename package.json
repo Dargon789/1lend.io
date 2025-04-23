@@ -53,7 +53,7 @@
         "process": "^0.11.10",
         "request": "^2.88.0",
         "rxjs": "~7.8.2",
-        "squarelink": "^0.4.4",
+        "squarelink": "^1.1.4",
         "tslib": "^2.8.1",
         "web3": "4.16.0",
         "zone.js": "~0.15.0"
