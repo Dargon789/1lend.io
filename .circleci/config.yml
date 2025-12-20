@@ -1,79 +1,44 @@
-version: 2
+version: 2.1
 jobs:
-    build:
-        branches:
-            only:
-                - master
-                - release
-            ignore:
-                - gh-pages
-        docker:
-            - image: circleci/node:10-browsers
-        working_directory: ~/repo
-        environment:
-            - SOURCE_BRANCH: master
-            - TARGET_BRANCH: gh-pages
-        steps:
-            - checkout
-            - restore_cache:
-                  keys:
-                      - v2-dependencies-{{ checksum "package.json" }}
-                      - v2-dependencies-
-            - run:
-                  name: Install dependencies
-                  command: yarn
-            - save_cache:
-                  paths:
-                      - node_modules
-                  key: v2-dependencies-{{ checksum "package.json" }}
-            #      - run:
-            #          name: Run lint
-            #          command: yarn run lint
-            #      - run:
-            #          name: Run smart contract tests
-            #          command: yarn run sm:test
-            #      - run:
-            #          name: Run tests
-            #          command: yarn run test
-            #      - run:
-            #          name: Run e2e
-            #          command: yarn run e2e
-            #      - run:
-            #          name: Run coverage
-            #          command: yarn run coverage && cat coverage/lcov.info | coveralls
-            - deploy:
-                  name: Deploy Frontend
-                  command: |
-                      if [ $CIRCLE_BRANCH == $SOURCE_BRANCH ]; then
-                        git config --global user.email $GH_EMAIL
-                        git config --global user.name $GH_NAME
+  doing-things-job:
+    docker:
+      - image: cimg/base:stable
+    parallelism: 3
+    steps:
+      - checkout
+      - run:
+          name: "Say hello"
+          command: "echo Hello, World!"
+      - run:
+          name: "Write random data"
+          command: openssl rand -hex 4 > rand_${CIRCLE_NODE_INDEX}.txt
+      - run:
+          name: "Emulate doing things"
+          command: |
+            if [[ "$CIRCLE_NODE_INDEX" != "0" ]]; then
+              sleep 30
+            fi
+      # save the files your deploy step needs
+      - persist_to_workspace:
+          root: .     # relative path to our working directory
+          paths:      # file globs which will be persisted to the workspace
+           - rand_*
 
-                        git clone $CIRCLE_REPOSITORY_URL out
+  deploy-job:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      # attach the files you persisted in the doing-things-job
+      - attach_workspace:
+          at: . # relative path to our working directory
+      - run:
+          command: |
+            echo "this is a deploy step"
 
-                        cd out
-                        git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
-                        git rm -rf .
-                        cd ..
-
-                        yarn run build
-
-                        cp -a web/dist/web/. out/.
-
-                        mkdir -p out/.circleci && cp -a .circleci/. out/.circleci/.
-                        cd out
-
-                        echo "1lend.io" > CNAME
-
-                        git add -A
-                        git commit -m "Automated deployment to GitHub Pages: ${CIRCLE_SHA1}" --allow-empty
-
-                        git push origin $TARGET_BRANCH
-
-                        echo "Done!"
-                      fi
-#      - deploy:
-#          name: Deploy Smart Contract
-#          command: |
-#            if [ $CIRCLE_BRANCH == release ]; then
-#              yarn run sm:deploy:prod
-#            fi
+workflows:
+  deploy-step-workflow:
+    jobs:
+      - doing-things-job
+      - deploy-job:
+          requires:
+            - doing-things-job
